@@ -1,0 +1,22 @@
+version: '3' #версия движка docker-compose 
+
+services: 
+  nginx: #наименование создаваемого сервиса (может быть любое)
+    image: nginx:latest #образ, который будет искаться на DockerHub'е, на основании которого будет создан контейнер
+    volumes:
+      - ./:/var/www/ #прокидываем всё содержимое текущей папки в var/www/ контейнера (принятая практика для расположения сайтов)
+      - ./_docker/nginx/conf.d/:/etc/nginx/conf.d/ #прокидываем конфиг nginx в контейнер
+    ports:
+      - "8876:80" #8876 - порт, к которому мы будем обращаться с хоста (любой), 80 - внутренний порт контейнера с nginx
+    container_name: project_nginx
+    depends_on: #от какого сервиса зависит (после какого сервиса запустится) (указывается именно название сервиса, а не контейнера)
+      - app
+
+  app:
+    build: 
+      context: .
+      dockerfile: _docker/app/Dockerfile
+    volumes:
+      - ./:/var/www/
+    container_name: project_app
+
